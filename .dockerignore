@@ -1,0 +1,10 @@
+.git
+.agents
+.codex
+build
+out
+out-soc
+fpga/chipdb
+*.swp
+*.pyc
+__pycache__

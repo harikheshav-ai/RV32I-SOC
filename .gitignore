@@ -1,0 +1,8 @@
+build/
+out/
+out-soc/
+fpga/chipdb/
+*.swp
+*.pyc
+__pycache__/
+tests/riscv-tests/
