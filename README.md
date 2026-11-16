@@ -1,6 +1,9 @@
 # RV32I Core
 
-A detailed web version of this README is in [`docs/index.html`](docs/index.html) (self-contained; open it in a browser).
+> Code and documentation generated with Claude (Anthropic). My role: specification, design
+> direction, review and hardware bring-up on an Arty A7-100T.
+
+**Web version:** [harikheshav-ai.github.io/RV32I-SOC](https://harikheshav-ai.github.io/RV32I-SOC/) (source: [`docs/index.html`](docs/index.html), self-contained; it also opens locally in a browser).
 
 An in-order RV32I pipeline with BRAM-style (request/response) instruction and data memory:
 
@@ -17,8 +20,8 @@ enables) at `0x80000000` loaded from `prog.hex`, and `tb.bsv` is the Bluesim tes
 The core talks to memory only through `Server#(MemReq, Word)` ports (in-order responses for
 reads; no response for writes), so other memories with different latency can be swapped in.
 
-- Supports all 37 RV32I base instructions, with FENCE as a no-op and clear halt reporting for ECALL, EBREAK,
-  illegal instructions, and misaligned accesses.
+- Supports all 40 RV32I instructions: FENCE is a no-op, and ECALL, EBREAK, illegal instructions and
+  misaligned accesses halt the core with a clear report.
 - Throughput is one instruction per cycle, including back-to-back independent loads and stores.
   Taken branches and jumps cost 3 extra cycles, and an instruction that uses a load's result
   waits 1 cycle. CPI on the test programs is about 1.35–1.7.
@@ -198,8 +201,8 @@ directory is kept by `make clean`. `fpga/arty_top.v` divides the 100 MHz board c
 flip-flop (onto a BUFG) for the 50 MHz core clock, and holds the SoC in reset for ~21 ms after
 configuration and while RESET is pressed. `fpga/arty_a7_100t.xdc` holds the pins.
 Current results: 32 RAMB36, about 6.6k LUTs (5% of the device), and a reported Fmax of 54.24 MHz
-against the 50 MHz target (seed 3). The critical path runs from the load/store address through the
-memory-port guards and the decode bypass into the fetch FIFO.
+against the 50 MHz target (seed 3). The critical path runs from the decode-to-execute operands through
+the signed branch comparator.
 
 The Docker hardware profile includes `openFPGALoader` for direct programming.
 For native, non-Docker programming, install it on the machine connected to the board.

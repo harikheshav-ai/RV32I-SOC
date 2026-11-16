@@ -230,6 +230,9 @@
   <p class="lede">An in-order, pipelined RV32I processor written in Bluespec SystemVerilog,
   checked instruction by instruction against Spike. It comes wrapped in a small SoC with
   BRAM and a UART for the Digilent Arty A7-100T, built with an open-source FPGA flow.</p>
+  <p class="lede"><em>Code and documentation generated with Claude (Anthropic). My role: specification,
+  design direction, review and hardware bring-up on an Arty A7-100T.</em>
+  Source: <a href="https://github.com/harikheshav-ai/RV32I-SOC">github.com/harikheshav-ai/RV32I-SOC</a>.</p>
   <div class="badges">
     <span class="badge">RV32I base ISA</span>
     <span class="badge">4-stage in-order pipeline</span>
@@ -239,7 +242,7 @@
     <span class="badge">yosys + nextpnr-xilinx</span>
   </div>
   <div class="cards">
-    <div class="card"><div class="v">37</div><div class="k">RV32I base instructions</div></div>
+    <div class="card"><div class="v">40</div><div class="k">RV32I instructions (ECALL/EBREAK halt)</div></div>
     <div class="card"><div class="v">1.35–1.7</div><div class="k">CPI on the C test programs</div></div>
     <div class="card"><div class="v">54.24&nbsp;MHz</div><div class="k">Fmax after routing (50 MHz target)</div></div>
     <div class="card"><div class="v">≈6.6k</div><div class="k">LUTs, 5% of the xc7a100t</div></div>
@@ -609,8 +612,7 @@ while the red RESET button is pressed, so loading a bitstream over JTAG starts t
 </table>
 <div class="note"><strong>Timing:</strong> nextpnr reports 54.24 MHz after routing (placement seed 3; <code>make fpga SEED=n</code> tries another) against the 50 MHz target.
 The slowest path runs
-from the load/store address through the memory-port ready conditions and the decode bypass into the fetch
-FIFO. If you change the core clock in <code>fpga/arty_top.v</code>, change
+from the decode-to-execute operands through the signed branch comparator. If you change the core clock in <code>fpga/arty_top.v</code>, change
 <code>FPGA_MHZ</code> in the Makefile to match.</div>
 <p>One more check was run on the bitstream: the number of 1-bits in all BRAM init data equals the number
 in the bootloader image (878). This confirms the boot code survived synthesis.</p>
