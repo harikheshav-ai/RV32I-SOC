@@ -1,4 +1,4 @@
-// See LICENSE for license details.
+// See LICENSE-riscv-tests for license details (from riscv-software-src/riscv-tests, BSD-3-Clause).
 
 #ifndef __TEST_MACROS_SCALAR_H
 #define __TEST_MACROS_SCALAR_H

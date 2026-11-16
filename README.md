@@ -243,3 +243,7 @@ five rv32ui tests) load over the UART and exit with code 0, back to back without
 
 `scripts/run_soc.py` takes `BUILD` and `SOC_OUT` from the environment to use other build/output
 directories (e.g. `BUILD=build2 SOC_OUT=$PWD/out-soc2 make soc-test BUILD=build2`).
+
+## License
+
+MIT (see `LICENSE`). `tests/env/test_macros.h` is from [riscv-tests](https://github.com/riscv-software-src/riscv-tests) (BSD-3-Clause, see `LICENSE-riscv-tests`); the riscv-tests suite itself is fetched at build time, not included.
