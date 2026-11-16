@@ -221,6 +221,7 @@
   <a href="#board">Running on the board</a>
   <a href="#software">Writing programs</a>
   <a href="#layout">Repository layout</a>
+  <a href="#license">License</a>
 </nav>
 
 <main>
@@ -233,6 +234,8 @@
   <p class="lede"><em>Code and documentation generated with Claude (Anthropic). My role: specification,
   design direction, review and hardware bring-up on an Arty A7-100T.</em>
   Source: <a href="https://github.com/harikheshav-ai/RV32I-SOC">github.com/harikheshav-ai/RV32I-SOC</a>.</p>
+  <p class="lede"><strong>Reproduced from a fresh clone on 2026-11-16:</strong> <code>make test</code> 58/58 (matches Spike),
+  <code>make soc-test</code> 10/10, <code>make fpga</code> 54.24 MHz at the 50 MHz target, and the same tests in Docker.</p>
   <div class="badges">
     <span class="badge">RV32I base ISA</span>
     <span class="badge">4-stage in-order pipeline</span>
@@ -677,6 +680,11 @@ docs/index.html        <span class="d">this page</span></code></pre></div>
   <tr><td><code>make fpga-program</code> / <code>make fpga-flash</code></td><td>Load the bitstream over JTAG, or write it to flash</td></tr>
   <tr><td><code>make clean</code></td><td>Remove <code>build/</code>, <code>out/</code> and <code>out-soc/</code> (keeps <code>fpga/chipdb/</code>)</td></tr>
 </table>
+
+<h2 id="license">License</h2>
+<p>MIT (see <code>LICENSE</code>). <code>tests/env/test_macros.h</code> is from
+<a href="https://github.com/riscv-software-src/riscv-tests">riscv-tests</a> (BSD-3-Clause, see <code>LICENSE-riscv-tests</code>);
+the riscv-tests suite itself is fetched at build time, not included.</p>
 
 </main>
 </div>
