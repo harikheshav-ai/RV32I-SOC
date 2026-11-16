@@ -3,6 +3,9 @@
 > Code and documentation generated with Claude (Anthropic). My role: specification, design
 > direction, review and hardware bring-up on an Arty A7-100T.
 
+> **Reproduced from a fresh clone on 2026-11-16:** `make test` 58/58 (matches Spike), `make soc-test` 10/10,
+> `make fpga` 54.24 MHz at the 50 MHz target, and the same tests in Docker (`docker compose`).
+
 **Web version:** [harikheshav-ai.github.io/RV32I-SOC](https://harikheshav-ai.github.io/RV32I-SOC/) (source: [`docs/index.html`](docs/index.html), self-contained; it also opens locally in a browser).
 
 An in-order RV32I pipeline with BRAM-style (request/response) instruction and data memory:
