@@ -18,6 +18,9 @@ import time
 
 import serial
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from run_tests import find_tool  # noqa: E402
+
 ACK, NAK, EOT = 0x06, 0x15, 0x04
 APP_MAX = 0xE000
 
@@ -26,8 +29,11 @@ def load_image(path):
     data = open(path, "rb").read()
     if data[:4] != b"\x7fELF":
         return data
-    objcopy = shutil.which("llvm-objcopy") or shutil.which("llvm-objcopy-17") \
-        or shutil.which("riscv64-unknown-elf-objcopy") or "llvm-objcopy"
+    objcopy = find_tool("llvm-objcopy", "OBJCOPY") \
+        or shutil.which("riscv64-unknown-elf-objcopy")
+    if not objcopy:
+        sys.exit("error: llvm-objcopy not found on PATH (set $OBJCOPY), "
+                 "or pass a raw .bin instead of an ELF")
     with tempfile.TemporaryDirectory() as d:
         out = os.path.join(d, "prog.bin")
         subprocess.run([objcopy, "-O", "binary", "--remove-section=.tohost", path, out], check=True)

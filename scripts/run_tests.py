@@ -18,11 +18,49 @@ RV32UI_SKIP = {"fence_i", "ma_data"}   # need Zifencei / misaligned access suppo
 ENV = os.path.join(ROOT, "tests", "env")
 OUT = os.path.join(ROOT, "out")
 SIM = os.path.join(ROOT, "build", "sim")
-SPIKE = os.environ.get("SPIKE", "/opt/riscv/riscv64-unknown-elf/bin/spike")
-CC = os.environ.get("CC", "clang")
-LD = os.environ.get("LD", "ld.lld")
-OBJCOPY = os.environ.get("OBJCOPY") or shutil.which("llvm-objcopy") \
-    or shutil.which("llvm-objcopy-17") or shutil.which("llvm-objcopy-15")
+
+
+def find_tool(name, env=None):
+    """$env if set, else `name` on PATH, else the highest-versioned `name-N`
+    on PATH (Debian/Ubuntu install e.g. llvm-objcopy-18 without the plain
+    name). Returns None if nothing is found."""
+    if env and os.environ.get(env):
+        return os.environ[env]
+    if shutil.which(name):
+        return shutil.which(name)
+    best = None
+    pat = re.compile(re.escape(name) + r"-(\d+)$")
+    for d in os.environ.get("PATH", "").split(os.pathsep):
+        try:
+            entries = os.listdir(d)
+        except OSError:
+            continue
+        for e in entries:
+            m = pat.match(e)
+            p = os.path.join(d, e)
+            if m and os.access(p, os.X_OK) and (best is None or int(m.group(1)) > best[0]):
+                best = (int(m.group(1)), p)
+    return best[1] if best else None
+
+
+SPIKE = os.environ.get("SPIKE") or shutil.which("spike") \
+    or "/opt/riscv/riscv64-unknown-elf/bin/spike"
+CC = find_tool("clang", "CC")
+LD = find_tool("ld.lld", "LD")
+OBJCOPY = find_tool("llvm-objcopy", "OBJCOPY")
+OBJDUMP = find_tool("llvm-objdump", "OBJDUMP")
+
+
+def check_tools():
+    """Exit with a clear message if a required toolchain program is missing."""
+    missing = [n for n, t in (("clang ($CC)", CC), ("ld.lld ($LD)", LD),
+                              ("llvm-objcopy ($OBJCOPY)", OBJCOPY),
+                              ("llvm-objdump ($OBJDUMP)", OBJDUMP)) if not t]
+    if missing:
+        sys.exit("error: required tool(s) not found on PATH: %s\n"
+                 "Install clang/lld/llvm (any version with the riscv32 target) "
+                 "or set the environment variable(s) shown." % ", ".join(missing))
+
 CFLAGS = ["--target=riscv32", "-march=rv32i", "-mabi=ilp32", "-nostdlib",
           "-ffreestanding", "-fno-builtin", "-mno-relax", "-I" + ENV]
 MEM_WORDS = 1 << 14
@@ -51,7 +89,7 @@ def build(name, sources, opt, d):
         for i in range(0, len(data), 4):
             f.write("%08x\n" % int.from_bytes(data[i:i + 4], "little"))
     with open(os.path.join(d, name + ".dis"), "w") as f:
-        sh([OBJCOPY.replace("objcopy", "objdump"), "-d", elf], stdout=f)
+        sh([OBJDUMP, "-d", elf], stdout=f)
     return elf
 
 
@@ -151,6 +189,7 @@ def main():
     ap.add_argument("--random", type=int, default=10, help="number of random tests")
     ap.add_argument("filters", nargs="*")
     args = ap.parse_args()
+    check_tools()
     use_spike = not args.no_spike and os.path.exists(SPIKE)
 
     tests = []

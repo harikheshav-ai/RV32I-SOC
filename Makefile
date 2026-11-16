@@ -66,7 +66,8 @@ PART      := xc7a100tcsg324-1
 FPGA_MHZ  := 50   # must match the core clock in fpga/arty_top.v
 SEED      ?= 3    # nextpnr placement seed; try another if timing fails
 CHIPDB    ?= $(CURDIR)/fpga/chipdb/$(PART).bin
-OPENXC7_IMAGE ?= regymm/openxc7:latest
+# Pinned to the same digest as the Dockerfile base image.
+OPENXC7_IMAGE ?= regymm/openxc7@sha256:35c910739e3a4b40850b85de31ebc8954985a66e982009f09123b70dbb0e75da
 
 ifeq ($(shell command -v nextpnr-xilinx),)
 XC7        = docker run --rm -u $(shell id -u):$(shell id -g) -v $(CURDIR):$(CURDIR) -w $(CURDIR)/$(FPGA) $(OPENXC7_IMAGE)

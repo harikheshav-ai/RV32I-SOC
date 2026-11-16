@@ -250,11 +250,13 @@
 </header>
 
 <h2 id="quickstart">Quick start</h2>
-<p>Requirements: <code>bsc</code>, clang with the riscv32 target, <code>ld.lld</code>, <code>llvm-objcopy</code>,
-Python 3 with <code>pyserial</code>, and optionally Spike, Icarus Verilog and Docker (for the FPGA tools).</p>
+<p>Requirements: <code>bsc</code> (tested with 2021.12.1 and 2026.01), clang with the riscv32 target, <code>ld.lld</code>,
+<code>llvm-objcopy</code>/<code>llvm-objdump</code>, Python 3 with <code>pyserial</code>, git and network access
+(riscv-tests is fetched at a pinned commit), and optionally Spike (co-simulation), Icarus Verilog and Docker (for the FPGA tools).</p>
 <h3>Docker quick start</h3>
 <p>For a consistent setup on Windows, Linux and macOS, build and run the pinned container:</p>
-<pre><code>docker compose build
+<pre><code>export HOST_UID=$(id -u) HOST_GID=$(id -g)   <span class="c"># Linux: own the output files (default 1000:1000)</span>
+docker compose build
 docker compose run --rm rv32i                 <span class="c"># core regression: 58 tests</span>
 docker compose run --rm rv32i make soc-test   <span class="c"># SoC/UART regression</span>
 docker compose run --rm rv32i make fpga       <span class="c"># Arty A7 bitstream</span>

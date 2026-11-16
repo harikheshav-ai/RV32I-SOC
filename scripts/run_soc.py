@@ -17,7 +17,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
-from run_tests import CC, LD, OBJCOPY, RV32UI, sh  # noqa: E402
+from run_tests import CC, LD, OBJCOPY, OBJDUMP, RV32UI, check_tools, sh  # noqa: E402
 
 OUT = os.environ.get("SOC_OUT", os.path.join(ROOT, "out-soc"))
 ENV = os.path.join(ROOT, "tests", "env")
@@ -41,7 +41,7 @@ def link(name, sources, opt, d, script):
     elf = os.path.join(d, name + ".elf")
     sh([LD, "-T", script, "-o", elf] + objs)
     with open(os.path.join(d, name + ".dis"), "w") as f:
-        sh([OBJCOPY.replace("objcopy", "objdump"), "-d", elf], stdout=f)
+        sh([OBJDUMP, "-d", elf], stdout=f)
     return elf
 
 
@@ -80,6 +80,7 @@ def main():
     ap.add_argument("--verilog", action="store_true", help="use the iverilog build")
     ap.add_argument("filters", nargs="*")
     args = ap.parse_args()
+    check_tools()
 
     if args.boot:
         print(build_boot(args.boot))

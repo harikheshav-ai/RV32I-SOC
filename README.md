@@ -26,6 +26,20 @@ reads; no response for writes), so other memories with different latency can be 
   Taken branches and jumps cost 3 extra cycles, and an instruction that uses a load's result
   waits 1 cycle. CPI on the test programs is about 1.35–1.7.
 
+## Requirements
+
+Native builds need:
+
+- `bsc` (Bluespec compiler; tested with 2021.12.1 and 2026.01)
+- clang with the riscv32 target, `ld.lld`, `llvm-objcopy` and `llvm-objdump`
+  (plain or versioned names such as `llvm-objcopy-18` are found on `PATH`;
+  override with `$CC`, `$LD`, `$OBJCOPY`, `$OBJDUMP`)
+- Python 3 with `pyserial`
+- git and network access (`make test` fetches riscv-tests at a pinned commit)
+- Optional: Spike (co-simulation against its commit log), Icarus Verilog
+  (`make soc-vsim`), Docker (`make fpga` without a native openXC7 install, or
+  the complete container below)
+
 ## Running
 
 ```
@@ -45,7 +59,7 @@ Tests (`scripts/run_tests.py`) need clang (riscv32 target), ld.lld and llvm-objc
 - Random programs from `scripts/gen_random.py` (dense dependencies, branches, jumps, loops, loads/stores).
 
 Each test must write `1` to `tohost` (at `0x8000F000`). If spike is found (`$SPIKE`,
-default `/opt/riscv/riscv64-unknown-elf/bin/spike`), each register write, store, and PC is
+else `spike` on `PATH`, else `/opt/riscv/riscv64-unknown-elf/bin/spike`), each register write, store, and PC is
 checked against `spike --log-commits`. Outputs are written to `out/<test>/` (`core.log`, `spike.log`, `.dis`).
 
 To run one program by hand, put `prog.hex` (one little-endian word per line) in the
@@ -59,6 +73,7 @@ Windows, Linux and macOS; the project directory is mounted into the container,
 so build outputs remain visible on the host.
 
 ```sh
+export HOST_UID=$(id -u) HOST_GID=$(id -g)   # Linux: own the output files (default 1000:1000)
 docker compose build
 docker compose run --rm rv32i                 # core regression: 58 tests
 docker compose run --rm rv32i make soc-test   # SoC/UART regression
@@ -67,6 +82,10 @@ docker compose --profile hardware run --rm rv32i-hardware make fpga-program
 docker compose --profile hardware run --rm rv32i-hardware \
   make run-elf ELF=out-soc/ex-hello/ex-hello.elf PORT=/dev/ttyUSBX
 ```
+
+The `rv32i` service runs as `HOST_UID:HOST_GID` so build outputs in the
+mounted directory stay owned by you; the `rv32i-hardware` service runs as root
+for USB/JTAG device access.
 
 The image uses pinned prebuilt tool layers and a parallel Spike build to keep
 the first image build within the ten-minute target on a typical developer
